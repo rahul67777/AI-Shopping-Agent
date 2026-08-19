@@ -1,0 +1,71 @@
+<div class="chat-container">
+    <!-- Header -->
+    <div class="chat-header">
+        <div class="bot-icon">🤖</div>
+        <div class="header-content">
+            <h2>General AI Assistant</h2>
+            <span>Powered by Gemini 3.6 Flash</span>
+        </div>
+        <div class="header-actions">
+            <button (click)="newChat()">New Chat</button>
+        </div>
+    </div>
+
+    <!-- Chat Body -->
+    <div class="chat-body" #chatBody>
+        @if (messages().length === 0) {
+        <div class="welcome">
+            <div class="welcome-icon">✨</div>
+            <h1>How can I help you?</h1>
+            <p>Ask me anything and I'll try to help.</p>
+        </div>
+        }
+
+        @for (message of messages(); track $index) {
+        @if (message.role === 'user') {
+        <div class="message user-message">
+            <div class="avatar">You</div>
+            <div class="message-content" [innerHTML]="formatMessage(message.text)"></div>
+        </div>
+        } @else {
+        <div class="message ai-message">
+            <div class="avatar">AI</div>
+            @if (message.text) {
+            <div style="display: block;">
+                <div class="message-content" [innerHTML]="formatMessage(message.text)"></div>
+                <button class="copy-btn" (click)="copyText(message.text, $index)" title="Copy response">
+                    @if (copiedIndex() === $index) {
+                    Copied!
+                    } @else {
+                    📋
+                    }
+                </button>
+            </div>
+            } @else {
+            <div class="message-content typing">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            }
+        </div>
+        }
+        }
+    </div>
+
+    <!-- Footer -->
+    <div class="chat-footer">
+        <div class="input-wrapper">
+            <input type="text" [ngModel]="prompt()" (ngModelChange)="prompt.set($event)" placeholder="Ask anything..."
+                [disabled]="loading()" (keyup.enter)="askAI()" />
+            <button type="button" (click)="askAI()" [disabled]="loading() || !prompt().trim()">
+                @if (loading()) {
+                <span class="loading-icon">↻</span>
+                } @else {
+                <span class="send-icon">➤</span>
+                }
+            </button>
+        </div>
+        <small>Gemini can make mistakes. Check important information.</small>
+    </div>
+</div>

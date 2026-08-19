@@ -1,0 +1,112 @@
+<div class="search-page-container">
+    <!-- Search Top Control Bar -->
+    <div class="search-top-bar">
+        <div class="search-input-box">
+            <span class="icon">🔍</span>
+            <input type="text" placeholder="Filter by keyword, RAM, GPU, camera specs..." [ngModel]="searchQuery()"
+                (ngModelChange)="searchQuery.set($event); applyFilters()" aria-label="Filter products" />
+            <button type="button" class="mic-btn" [class.listening]="speechService.isListening()"
+                (click)="speechService.toggleListening()" title="Voice Search" aria-label="Voice Search">
+                🎤
+            </button>
+        </div>
+
+        <!-- View Mode & Sort Dropdown -->
+        <div class="top-controls-right">
+            <div class="sort-select-wrapper">
+                <label for="sortSelect">Sort By:</label>
+                <select id="sortSelect" [ngModel]="sortBy()" (ngModelChange)="sortBy.set($event); applyFilters()">
+                    <option value="aiScore">🤖 Highest AI Match Score</option>
+                    <option value="priceLowHigh">₹ Price: Low to High</option>
+                    <option value="priceHighLow">₹ Price: High to Low</option>
+                    <option value="rating">★ Highest Customer Rating</option>
+                </select>
+            </div>
+
+            <div class="view-toggle">
+                <button type="button" [class.active]="viewMode() === 'grid'" (click)="toggleViewMode('grid')"
+                    title="Grid View">
+                    ▦ Grid
+                </button>
+                <button type="button" [class.active]="viewMode() === 'list'" (click)="toggleViewMode('list')"
+                    title="List View">
+                    ☰ List
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="search-layout">
+        <!-- Filters Sidebar -->
+        <aside class="filters-sidebar">
+            <div class="sidebar-header">
+                <h3>🎛️ AI Filters</h3>
+                <button type="button" class="reset-btn" (click)="resetFilters()">Reset All</button>
+            </div>
+
+            <!-- Category Filter -->
+            <div class="filter-group">
+                <label class="filter-title">Category</label>
+                <select [ngModel]="selectedCategory()" (ngModelChange)="selectedCategory.set($event); applyFilters()">
+                    @for (cat of productService.categories; track cat.id) {
+                    <option [value]="cat.id">{{ cat.label }}</option>
+                    }
+                </select>
+            </div>
+
+            <!-- Brand Filter -->
+            <div class="filter-group">
+                <label class="filter-title">Brand</label>
+                <select [ngModel]="selectedBrand()" (ngModelChange)="selectedBrand.set($event); applyFilters()">
+                    <option value="all">All Brands</option>
+                    @for (brand of productService.getAllBrands(); track brand) {
+                    <option [value]="brand">{{ brand }}</option>
+                    }
+                </select>
+            </div>
+
+            <!-- Max Price Slider -->
+            <div class="filter-group">
+                <div class="slider-header">
+                    <span class="filter-title">Max Budget</span>
+                    <span class="slider-val">₹{{ maxPrice().toLocaleString('en-IN') }}</span>
+                </div>
+                <input type="range" min="5000" max="100000" step="2000" [ngModel]="maxPrice()"
+                    (ngModelChange)="maxPrice.set($event); applyFilters()" />
+            </div>
+
+            <!-- Min AI Match Score Filter -->
+            <div class="filter-group">
+                <div class="slider-header">
+                    <span class="filter-title">Min AI Score</span>
+                    <span class="slider-val">{{ minAiScore() }}%</span>
+                </div>
+                <input type="range" min="0" max="95" step="5" [ngModel]="minAiScore()"
+                    (ngModelChange)="minAiScore.set($event); applyFilters()" />
+            </div>
+        </aside>
+
+        <!-- Product Results Grid/List -->
+        <main class="results-main">
+            <div class="results-meta">
+                Showing <strong>{{ productService.filteredProducts().length }}</strong> items matching your criteria
+            </div>
+
+            @if (productService.filteredProducts().length === 0) {
+            <div class="no-results-box">
+                <span class="emoji">🔍</span>
+                <h3>No products match your filters</h3>
+                <p>Try resetting filters or adjusting maximum budget slider.</p>
+                <button type="button" class="reset-cta" (click)="resetFilters()">Reset Filters</button>
+            </div>
+            } @else {
+            <div class="products-container" [class.list-view]="viewMode() === 'list'">
+                @for (prod of productService.filteredProducts(); track prod.id) {
+                <app-product-card [product]="prod" (addToCart)="onAddToCart($event)"
+                    (compare)="onCompare($event)"></app-product-card>
+                }
+            </div>
+            }
+        </main>
+    </div>
+</div>

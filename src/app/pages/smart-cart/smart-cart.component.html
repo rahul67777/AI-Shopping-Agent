@@ -1,0 +1,137 @@
+<div class="cart-page-container">
+    <div class="page-header">
+        <h1>🛒 Smart AI Cart</h1>
+        <p>Manage your bundle items, track budget caps, and calculate total savings.</p>
+    </div>
+
+    @if (cartService.itemCount() === 0) {
+    <div class="empty-cart-card">
+        <span class="empty-icon">🛒</span>
+        <h2>Your Smart Cart is Empty</h2>
+        <p>Ask our AI assistant to build a setup bundle or add products from our catalog!</p>
+        <div class="empty-actions">
+            <a routerLink="/shopping/chat" class="cta-primary">🤖 Ask AI Assistant</a>
+            <a routerLink="/shopping/search" class="cta-secondary">🔎 Browse Catalog</a>
+        </div>
+    </div>
+    } @else {
+    <!-- Smart Budget Gauge Widget -->
+    <div class="budget-gauge-card" [class.over-budget]="cartService.isOverBudget()">
+        <div class="gauge-header">
+            <div class="gauge-title">
+                <span>🎯 Target Budget Cap</span>
+                @if (!isEditingBudget()) {
+                <span class="budget-amount">₹{{ cartService.targetBudget().toLocaleString('en-IN') }}</span>
+                <button type="button" class="edit-btn" (click)="isEditingBudget.set(true)">✏️ Edit</button>
+                } @else {
+                <div class="edit-budget-box">
+                    <input type="number" [ngModel]="tempBudget()" (ngModelChange)="tempBudget.set($event)"
+                        step="5000" />
+                    <button type="button" class="save-btn" (click)="updateBudget()">Save</button>
+                </div>
+                }
+            </div>
+
+            <button type="button" class="optimize-btn" (click)="optimizeCartWithAi()"
+                title="Auto-trim cart items to fit target budget cap">
+                🤖 AI Budget Optimizer
+            </button>
+        </div>
+
+        <!-- Budget Meter Progress Bar -->
+        <div class="budget-meter">
+            <div class="meter-bar">
+                <div class="meter-fill" [style.width.%]="getBudgetProgressPercent()"
+                    [class.warning]="cartService.isOverBudget()"></div>
+            </div>
+            <div class="meter-details">
+                <span class="spent">Total Cart Price: <strong>₹{{ cartService.totalPrice().toLocaleString('en-IN')
+                        }}</strong></span>
+                <span class="remaining" [class.negative]="cartService.remainingBudget() < 0">
+                    @if (cartService.remainingBudget() >= 0) {
+                    Remaining Budget: ₹{{ cartService.remainingBudget().toLocaleString('en-IN') }}
+                    } @else {
+                    ⚠️ Over Budget by ₹{{ getAbsRemainingBudget().toLocaleString('en-IN') }}
+                    }
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Cart Layout Grid -->
+    <div class="cart-grid-layout">
+        <!-- Cart Items List -->
+        <div class="cart-items-list">
+            @for (item of cartService.items(); track item.product.id) {
+            <div class="cart-item-card">
+                <img [src]="item.product.image" [alt]="item.product.name" class="item-img" />
+
+                <div class="item-info">
+                    @if (item.addedByAi) {
+                    <span class="ai-added-chip">🤖 AI Suggested Item</span>
+                    }
+                    <h3 class="item-title">
+                        <a [routerLink]="['/shopping/product', item.product.id]">{{ item.product.name }}</a>
+                    </h3>
+                    <span class="item-brand">{{ item.product.brand }} • {{ item.product.category }}</span>
+                    <div class="price-single">₹{{ item.product.price.toLocaleString('en-IN') }} each</div>
+                </div>
+
+                <!-- Quantity Selector Controls -->
+                <div class="item-controls">
+                    <div class="qty-stepper">
+                        <button type="button" (click)="onQuantityChange(item.product.id, item.quantity - 1)">-</button>
+                        <span class="qty-val">{{ item.quantity }}</span>
+                        <button type="button" (click)="onQuantityChange(item.product.id, item.quantity + 1)">+</button>
+                    </div>
+                    <button type="button" class="remove-btn" (click)="onRemove(item.product.id)">
+                        🗑️ Remove
+                    </button>
+                </div>
+
+                <div class="item-total-price">
+                    ₹{{ (item.product.price * item.quantity).toLocaleString('en-IN') }}
+                </div>
+            </div>
+            }
+        </div>
+
+        <!-- Summary Checkout Sidebar -->
+        <aside class="cart-summary-sidebar">
+            <h3>Summary</h3>
+
+            <div class="summary-rows">
+                <div class="sum-row">
+                    <span>Subtotal ({{ cartService.itemCount() }} items):</span>
+                    <span class="val">₹{{ cartService.originalTotalPrice().toLocaleString('en-IN') }}</span>
+                </div>
+
+                @if (cartService.estimatedSavings() > 0) {
+                <div class="sum-row savings">
+                    <span>Estimated AI Savings:</span>
+                    <span class="val">-₹{{ cartService.estimatedSavings().toLocaleString('en-IN') }}</span>
+                </div>
+                }
+
+                <div class="sum-row shipping">
+                    <span>Express Delivery:</span>
+                    <span class="val free">FREE</span>
+                </div>
+
+                <div class="sum-row total">
+                    <span>Final Total:</span>
+                    <span class="val total-amount">₹{{ cartService.totalPrice().toLocaleString('en-IN') }}</span>
+                </div>
+            </div>
+
+            <button type="button" class="checkout-cta-btn" (click)="proceedToCheckout()">
+                Proceed to Checkout 🔒
+            </button>
+
+            <button type="button" class="clear-cart-link" (click)="cartService.clearCart()">
+                Clear Cart
+            </button>
+        </aside>
+    </div>
+    }
+</div>

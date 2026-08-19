@@ -1,0 +1,161 @@
+<div class="checkout-page-container">
+    @if (orderSuccess()) {
+    <div class="order-success-card">
+        <div class="success-icon">🎉</div>
+        <h2>Order Placed Successfully!</h2>
+        <p class="order-id">Order Reference: <strong>{{ orderId() }}</strong></p>
+        <p class="desc">
+            Your order is secured under <strong>ShopAI Price Protection Guarantee</strong>. If any item price drops
+            within 7 days, you will receive automatic cash credit refund!
+        </p>
+
+        <div class="actions">
+            <a routerLink="/shopping/home" class="home-btn">Return to Home Page</a>
+        </div>
+    </div>
+    } @else if (cartService.itemCount() === 0) {
+    <div class="empty-state">
+        <h2>No Items to Checkout</h2>
+        <a routerLink="/shopping/search" class="cta">Browse Products</a>
+    </div>
+    } @else {
+    <div class="page-header">
+        <h1>🔒 Secure AI Checkout</h1>
+        <p>Complete your shipping information and payment preference.</p>
+    </div>
+
+    <div class="checkout-grid">
+        <!-- Shipping & Payment Form -->
+        <form [formGroup]="checkoutForm" (ngSubmit)="submitOrder()" class="checkout-form">
+            <!-- Section 1: Contact & Delivery Address -->
+            <section class="form-section">
+                <h3>1. Shipping Address</h3>
+                <div class="form-grid">
+                    <div class="field-box full">
+                        <label for="fullName">Full Name *</label>
+                        <input id="fullName" type="text" formControlName="fullName" placeholder="e.g. Rahul Sharma" />
+                        @if (checkoutForm.get('fullName')?.touched && checkoutForm.get('fullName')?.invalid) {
+                        <span class="err-text">Please enter a valid full name (min 3 chars).</span>
+                        }
+                    </div>
+
+                    <div class="field-box">
+                        <label for="email">Email Address *</label>
+                        <input id="email" type="email" formControlName="email" placeholder="rahul@example.com" />
+                        @if (checkoutForm.get('email')?.touched && checkoutForm.get('email')?.invalid) {
+                        <span class="err-text">Enter a valid email address.</span>
+                        }
+                    </div>
+
+                    <div class="field-box">
+                        <label for="phone">10-Digit Mobile Number *</label>
+                        <input id="phone" type="tel" formControlName="phone" placeholder="9876543210" />
+                        @if (checkoutForm.get('phone')?.touched && checkoutForm.get('phone')?.invalid) {
+                        <span class="err-text">Enter a 10-digit mobile number.</span>
+                        }
+                    </div>
+
+                    <div class="field-box full">
+                        <label for="address">Street Address / Landmark *</label>
+                        <textarea id="address" rows="2" formControlName="address"
+                            placeholder="Flat No., House Name, Street..."></textarea>
+                        @if (checkoutForm.get('address')?.touched && checkoutForm.get('address')?.invalid) {
+                        <span class="err-text">Address is required.</span>
+                        }
+                    </div>
+
+                    <div class="field-box">
+                        <label for="city">City / Town *</label>
+                        <input id="city" type="text" formControlName="city" placeholder="Bengaluru" />
+                    </div>
+
+                    <div class="field-box">
+                        <label for="pincode">6-Digit Pincode *</label>
+                        <input id="pincode" type="text" formControlName="pincode" placeholder="560001" />
+                        @if (checkoutForm.get('pincode')?.touched && checkoutForm.get('pincode')?.invalid) {
+                        <span class="err-text">Enter valid 6-digit PIN.</span>
+                        }
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Payment Method -->
+            <section class="form-section">
+                <h3>2. Payment Selection</h3>
+                <div class="payment-options">
+                    <label class="pay-option" [class.selected]="checkoutForm.get('paymentMethod')?.value === 'upi'">
+                        <input type="radio" formControlName="paymentMethod" value="upi" />
+                        <div class="pay-info">
+                            <span class="pay-title">⚡ Instant UPI (GPay / PhonePe / Paytm / BHIM)</span>
+                            <span class="pay-sub">Fastest checkout with instant ₹500 cashback coupon</span>
+                        </div>
+                    </label>
+
+                    <label class="pay-option" [class.selected]="checkoutForm.get('paymentMethod')?.value === 'card'">
+                        <input type="radio" formControlName="paymentMethod" value="card" />
+                        <div class="pay-info">
+                            <span class="pay-title">💳 Credit / Debit Card</span>
+                            <span class="pay-sub">Visa, Mastercard, RuPay, HDFC, ICICI, SBI Cards</span>
+                        </div>
+                    </label>
+
+                    <label class="pay-option" [class.selected]="checkoutForm.get('paymentMethod')?.value === 'cod'">
+                        <input type="radio" formControlName="paymentMethod" value="cod" />
+                        <div class="pay-info">
+                            <span class="pay-title">💵 Cash on Delivery</span>
+                            <span class="pay-sub">Pay at doorstep upon delivery</span>
+                        </div>
+                    </label>
+                </div>
+            </section>
+
+            <!-- AI Guarantee Banner -->
+            <div class="guarantee-badge">
+                🛡️ <strong>AI Price Protection Included:</strong> Auto refund if price drops within 7 days.
+            </div>
+
+            <button type="submit" class="submit-order-btn">
+                Confirm Order & Pay ₹{{ cartService.totalPrice().toLocaleString('en-IN') }} →
+            </button>
+        </form>
+
+        <!-- Order Summary Card -->
+        <aside class="order-summary-card">
+            <h3>Order Items ({{ cartService.itemCount() }})</h3>
+            <div class="items-mini-list">
+                @for (item of cartService.items(); track item.product.id) {
+                <div class="item-mini-row">
+                    <img [src]="item.product.image" [alt]="item.product.name" />
+                    <div class="info">
+                        <span class="name">{{ item.product.name }}</span>
+                        <span class="qty">Qty: {{ item.quantity }}</span>
+                    </div>
+                    <span class="price">₹{{ (item.product.price * item.quantity).toLocaleString('en-IN') }}</span>
+                </div>
+                }
+            </div>
+
+            <div class="totals-breakdown">
+                <div class="total-line">
+                    <span>Subtotal</span>
+                    <span>₹{{ cartService.originalTotalPrice().toLocaleString('en-IN') }}</span>
+                </div>
+                @if (cartService.estimatedSavings() > 0) {
+                <div class="total-line savings">
+                    <span>AI Savings</span>
+                    <span>-₹{{ cartService.estimatedSavings().toLocaleString('en-IN') }}</span>
+                </div>
+                }
+                <div class="total-line">
+                    <span>Delivery Fee</span>
+                    <span class="free">FREE</span>
+                </div>
+                <div class="total-line grand">
+                    <span>Amount Payable</span>
+                    <span class="grand-val">₹{{ cartService.totalPrice().toLocaleString('en-IN') }}</span>
+                </div>
+            </div>
+        </aside>
+    </div>
+    }
+</div>

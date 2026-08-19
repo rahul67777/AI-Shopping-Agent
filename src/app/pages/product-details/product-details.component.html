@@ -1,0 +1,144 @@
+@if (product(); as prod) {
+<div class="details-page-container">
+    <!-- Breadcrumb Nav -->
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a routerLink="/shopping/home">Home</a> /
+        <a routerLink="/shopping/search">Catalog</a> /
+        <span class="current">{{ prod.name }}</span>
+    </nav>
+
+    <!-- Top Grid: Image Gallery + Primary Details -->
+    <div class="product-hero-grid">
+        <!-- Media Gallery -->
+        <div class="product-gallery">
+            <img [src]="prod.image" [alt]="prod.name" class="main-img" />
+
+            <!-- Badges Overlay -->
+            <div class="gallery-badges">
+                <app-ai-score-badge [score]="prod.aiScore" [reason]="prod.aiScoreReason"
+                    [showReason]="true"></app-ai-score-badge>
+            </div>
+        </div>
+
+        <!-- Main Info Panel -->
+        <div class="product-info-panel">
+            <div class="brand-rating-row">
+                <span class="brand-badge">{{ prod.brand }}</span>
+                <div class="rating-box">
+                    <span class="stars">★ {{ prod.rating }}</span>
+                    <span class="count">({{ prod.reviewCount }} verified reviews)</span>
+                </div>
+            </div>
+
+            <h1 class="product-name">{{ prod.name }}</h1>
+
+            <!-- Price Section -->
+            <div class="price-header-box">
+                <div class="price-main">
+                    <span class="price-current">₹{{ prod.price.toLocaleString('en-IN') }}</span>
+                    @if (prod.originalPrice > prod.price) {
+                    <span class="price-old">₹{{ prod.originalPrice.toLocaleString('en-IN') }}</span>
+                    <span class="discount-pill">
+                        Save ₹{{ (prod.originalPrice - prod.price).toLocaleString('en-IN') }}
+                    </span>
+                    }
+                </div>
+                <span class="tax-note">Inclusive of all taxes & free express delivery</span>
+            </div>
+
+            <p class="description-text">{{ prod.description }}</p>
+
+            <!-- Highlights Chips -->
+            <div class="badges-row">
+                @for (badge of prod.badges; track badge) {
+                <span class="highlight-chip">{{ badge }}</span>
+                }
+            </div>
+
+            <!-- CTA Action Buttons -->
+            <div class="cta-buttons">
+                <button type="button" class="add-cart-btn" [class.added]="addedSuccess()" (click)="onAddToCart()">
+                    @if (addedSuccess()) {
+                    <span>✓ Added to Smart Cart</span>
+                    } @else {
+                    <span>🛒 Add to Smart Cart</span>
+                    }
+                </button>
+
+                <button type="button" class="buy-now-btn" (click)="buyNow()">
+                    ⚡ Instant Checkout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 2: AI Price Trend & Recommendation -->
+    <section class="section-card">
+        <h2 class="section-heading">📈 Price Intelligence & Buy Recommendation</h2>
+        <app-price-history-chart [product]="prod"></app-price-history-chart>
+    </section>
+
+    <!-- Section 3: Multi-Store Price Comparison Table -->
+    @if (comparison(); as comp) {
+    <section class="section-card">
+        <h2 class="section-heading">🏬 Multi-Store Price Comparison</h2>
+        <p class="section-sub">Real-time live prices across major Indian online stores.</p>
+
+        <div class="stores-table-wrapper">
+            <table class="stores-table">
+                <thead>
+                    <tr>
+                        <th>Store</th>
+                        <th>Status</th>
+                        <th>Price</th>
+                        <th>Offer / Tag</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (store of comp.stores; track store.storeName) {
+                    <tr [class.best-row]="store.isBestDeal">
+                        <td class="store-name-cell">
+                            <strong>{{ store.storeName }}</strong>
+                            @if (store.isBestDeal) {
+                            <span class="best-deal-badge">🔥 CHEAPEST</span>
+                            }
+                        </td>
+                        <td>
+                            <span class="stock-status" [class.in-stock]="store.inStock">
+                                {{ store.inStock ? '✓ In Stock' : 'Out of Stock' }}
+                            </span>
+                        </td>
+                        <td class="price-cell">
+                            ₹{{ store.price.toLocaleString('en-IN') }}
+                        </td>
+                        <td>
+                            <span class="deal-tag">{{ store.dealTag || 'Standard Price' }}</span>
+                        </td>
+                        <td>
+                            <button type="button" class="visit-store-btn" (click)="onAddToCart()">
+                                Buy on {{ store.storeName }}
+                            </button>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+    }
+
+    <!-- Section 4: Specifications Matrix -->
+    <section class="section-card">
+        <h2 class="section-heading">🛠️ Full Technical Specifications</h2>
+        <div class="specs-table">
+            @for (spec of getSpecsArray(); track spec.key) {
+            <div class="spec-row">
+                <span class="spec-label">{{ spec.key }}</span>
+                <span class="spec-val">{{ spec.value }}</span>
+            </div>
+            }
+        </div>
+    </section>
+</div>
+}

@@ -1,0 +1,71 @@
+<article class="product-card" [class.highlight-top]="highlightAi() || product().isRecommended">
+    <!-- Card Header & Image -->
+    <div class="card-media">
+        <img [src]="product().image" [alt]="product().name" class="product-img" loading="lazy" />
+
+        <!-- Top Badges Overlay -->
+        <div class="badge-overlay">
+            <app-ai-score-badge [score]="product().aiScore" [reason]="product().aiScoreReason"></app-ai-score-badge>
+
+            @if (discountPercent() > 0) {
+            <span class="discount-badge">-{{ discountPercent() }}% OFF</span>
+            }
+        </div>
+
+        <!-- Category / Brand Chip -->
+        <div class="brand-chip">
+            {{ product().brand }}
+        </div>
+    </div>
+
+    <!-- Card Body -->
+    <div class="card-content">
+        <div class="rating-row">
+            <span class="stars">★ {{ product().rating }}</span>
+            <span class="reviews">({{ product().reviewCount }} reviews)</span>
+        </div>
+
+        <h3 class="product-title">
+            <a [routerLink]="['/shopping/product', product().id]" [title]="product().name">
+                {{ product().name }}
+            </a>
+        </h3>
+
+        <!-- Feature Specs Chips -->
+        <div class="specs-chips">
+            @for (spec of getSpecsPreview(); track spec) {
+            <span class="spec-pill">{{ spec }}</span>
+            }
+        </div>
+
+        <!-- Price Section -->
+        <div class="price-row">
+            <div class="price-box">
+                <span class="current-price">₹{{ product().price.toLocaleString('en-IN') }}</span>
+                @if (product().originalPrice > product().price) {
+                <span class="original-price">₹{{ product().originalPrice.toLocaleString('en-IN') }}</span>
+                }
+            </div>
+            <span class="best-store-badge">
+                Lowest on {{ product().stores[0]?.storeName || 'Online' }}
+            </span>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="card-actions">
+            <button type="button" class="add-cart-btn" [class.added]="addedSuccess()" (click)="onAddToCart()"
+                aria-label="Add product to Smart Cart">
+                @if (addedSuccess()) {
+                <span>✓ Added to Cart!</span>
+                } @else {
+                <span>🛒 Add to Cart</span>
+                }
+            </button>
+
+            <a [routerLink]="['/shopping/product', product().id]" class="details-btn"
+                title="View Product Details & AI Analysis">
+                🔍 View
+            </a>
+        </div>
+    </div>
+</article>

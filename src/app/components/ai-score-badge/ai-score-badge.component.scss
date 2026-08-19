@@ -1,0 +1,71 @@
+.ai-badge-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(8px);
+    cursor: help;
+    transition: transform 0.2s ease;
+
+    &:hover {
+        transform: scale(1.05);
+    }
+
+    .badge-icon {
+        font-size: 0.9rem;
+    }
+
+    .badge-details {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .score-percent {
+        font-weight: 800;
+        font-size: 0.85rem;
+    }
+
+    &.score-supreme {
+        background: linear-gradient(135deg, #a855f7, #6366f1);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    &.score-excellent {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    &.score-good {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: #ffffff;
+    }
+
+    &.score-average {
+        background: rgba(100, 116, 139, 0.3);
+        color: #cbd5e1;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+}
+
+.ai-reason-box {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: rgba(99, 102, 241, 0.12);
+    border-left: 3px solid #6366f1;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.82rem;
+    color: #c7d2fe;
+    line-height: 1.4;
+
+    .sparkle {
+        font-weight: 700;
+        color: #a855f7;
+    }
+}

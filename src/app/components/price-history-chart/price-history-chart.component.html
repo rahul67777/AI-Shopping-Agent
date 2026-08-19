@@ -1,0 +1,53 @@
+<div class="price-history-card">
+    <!-- AI Buy Recommendation Header -->
+    <div class="recommendation-banner" [class.buy-now]="product().aiRecommendation === 'BUY_NOW'">
+        <div class="rec-icon">
+            {{ product().aiRecommendation === 'BUY_NOW' ? '⚡' : '⏳' }}
+        </div>
+        <div class="rec-text">
+            <span class="rec-title">
+                AI Decision: {{ product().aiRecommendation === 'BUY_NOW' ? 'BUY NOW' : 'WAIT FOR SALE' }}
+            </span>
+            <span class="rec-desc">
+                @if (product().aiRecommendation === 'BUY_NOW') {
+                Price is at ₹{{ product().lowestPrice.toLocaleString('en-IN') }} (lowest level). Great time to purchase!
+                } @else {
+                Current price ₹{{ product().price.toLocaleString('en-IN') }} is above lowest (₹{{
+                product().lowestPrice.toLocaleString('en-IN') }}). Potential drop expected.
+                }
+            </span>
+        </div>
+    </div>
+
+    <!-- Price Stat Cards -->
+    <div class="stats-grid">
+        <div class="stat-item current">
+            <span class="stat-label">Current Price</span>
+            <span class="stat-value">₹{{ product().price.toLocaleString('en-IN') }}</span>
+        </div>
+        <div class="stat-item lowest">
+            <span class="stat-label">Lowest Price</span>
+            <span class="stat-value">₹{{ product().lowestPrice.toLocaleString('en-IN') }}</span>
+            <span class="stat-tag">Best Deal</span>
+        </div>
+        <div class="stat-item highest">
+            <span class="stat-label">Highest Price</span>
+            <span class="stat-value">₹{{ product().highestPrice.toLocaleString('en-IN') }}</span>
+        </div>
+    </div>
+
+    <!-- Visual Price History Bars -->
+    <div class="chart-section">
+        <span class="chart-title">📈 90-Day Price Trend</span>
+        <div class="bars-container">
+            @for (point of product().priceHistory; track point.date) {
+            <div class="bar-column">
+                <div class="bar-tooltip">₹{{ point.price.toLocaleString('en-IN') }}</div>
+                <div class="bar-fill" [style.height.%]="getBarHeight(point.price)"
+                    [class.lowest-bar]="point.price === product().lowestPrice"></div>
+                <span class="bar-label">{{ point.date }}</span>
+            </div>
+            }
+        </div>
+    </div>
+</div>

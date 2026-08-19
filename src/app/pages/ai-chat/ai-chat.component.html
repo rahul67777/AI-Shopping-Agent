@@ -1,0 +1,122 @@
+<div class="chat-page-layout">
+    <!-- Page Header -->
+    <div class="chat-header-bar">
+        <div class="header-info">
+            <h2>🤖 AI Shopping Assistant</h2>
+            <p>Ask anything about tech, laptops, smartphones, or ask to build complete setup bundles!</p>
+        </div>
+        <div class="header-status">
+            <span class="status-dot"></span> Online & Connected to Gemini AI
+        </div>
+    </div>
+
+    <!-- Messages Body -->
+    <div class="chat-body" #chatBody>
+        @for (msg of messages(); track msg.id) {
+        <div class="message-row" [class.user-row]="msg.sender === 'user'" [class.ai-row]="msg.sender === 'ai'">
+            <div class="avatar">
+                {{ msg.sender === 'user' ? '👤' : '🤖' }}
+            </div>
+
+            <div class="message-bubble">
+                <!-- User / AI Markdown Content -->
+                <div class="markdown-content" [innerHTML]="formatMarkdown(msg.text)"></div>
+
+                <!-- Loading Indicator -->
+                @if (msg.isLoading) {
+                <div class="typing-indicator">
+                    <span></span><span></span><span></span>
+                </div>
+                }
+
+                <!-- Extracted Intent Pills -->
+                @if (msg.extractedIntent && (msg.extractedIntent.category || msg.extractedIntent.budget ||
+                msg.extractedIntent.brand)) {
+                <div class="intent-chips">
+                    <span class="intent-title">Target Parameters:</span>
+                    @if (msg.extractedIntent.category) {
+                    <span class="intent-chip">Category: {{ msg.extractedIntent.category }}</span>
+                    }
+                    @if (msg.extractedIntent.budget) {
+                    <span class="intent-chip budget">Budget: ₹{{ msg.extractedIntent.budget.toLocaleString('en-IN')
+                        }}</span>
+                    }
+                    @if (msg.extractedIntent.brand) {
+                    <span class="intent-chip">Brand: {{ msg.extractedIntent.brand }}</span>
+                    }
+                    @if (msg.extractedIntent.useCase) {
+                    <span class="intent-chip usecase">Goal: {{ msg.extractedIntent.useCase }}</span>
+                    }
+                </div>
+                }
+
+                <!-- Smart Cart Bundle Preview Card -->
+                @if (msg.smartCartBundle) {
+                <div class="bundle-box">
+                    <div class="bundle-header">
+                        <h4>🎁 AI Smart Bundle: {{ msg.smartCartBundle.title }}</h4>
+                        <span class="bundle-price">₹{{ msg.smartCartBundle.totalPrice.toLocaleString('en-IN') }}</span>
+                    </div>
+                    <p class="bundle-sub">
+                        Estimated Savings: ₹{{ msg.smartCartBundle.estimatedSavings.toLocaleString('en-IN') }} |
+                        Remaining Budget: ₹{{ msg.smartCartBundle.remainingBudget.toLocaleString('en-IN') }}
+                    </p>
+                    <div class="bundle-items-list">
+                        @for (item of msg.smartCartBundle.items; track item.product.id) {
+                        <div class="bundle-item-row">
+                            <span>{{ item.product.name }}</span>
+                            <span class="item-cost">₹{{ item.product.price.toLocaleString('en-IN') }}</span>
+                        </div>
+                        }
+                    </div>
+                    <button type="button" class="apply-bundle-btn" (click)="applyBundle(msg.smartCartBundle)">
+                        🛒 Load All {{ msg.smartCartBundle.items.length }} Items into Smart Cart →
+                    </button>
+                </div>
+                }
+
+                <!-- In-Chat Recommended Products Grid -->
+                @if (msg.recommendedProducts && msg.recommendedProducts.length > 0) {
+                <div class="inchat-products-section">
+                    <div class="inchat-title">Matches Ranked by AI:</div>
+                    <div class="inchat-grid">
+                        @for (prod of msg.recommendedProducts; track prod.id) {
+                        <app-product-card [product]="prod" (addToCart)="onAddToCart($event)"
+                            (compare)="onCompare($event)"></app-product-card>
+                        }
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+        }
+    </div>
+
+    <!-- Quick Prompts Row -->
+    <div class="quick-prompts-bar">
+        <span class="quick-title">Quick Prompts:</span>
+        <div class="quick-chips">
+            @for (qp of quickQueries; track qp) {
+            <button type="button" class="qp-chip" (click)="sendQuery(qp)">
+                {{ qp }}
+            </button>
+            }
+        </div>
+    </div>
+
+    <!-- Input Controls Footer -->
+    <div class="chat-input-footer">
+        <form (submit)="$event.preventDefault(); sendQuery()" class="chat-form">
+            <input type="text" class="chat-input" placeholder="Type a shopping requirement or question..."
+                [ngModel]="userInput()" (ngModelChange)="userInput.set($event)" name="chatInput"
+                aria-label="Chat with AI Shopping Agent" />
+            <button type="button" class="mic-btn" [class.listening]="speechService.isListening()"
+                (click)="speechService.toggleListening()" title="Voice Input" aria-label="Voice Input">
+                🎤
+            </button>
+            <button type="submit" class="send-btn" [disabled]="loading() || !userInput().trim()">
+                Send 🚀
+            </button>
+        </form>
+    </div>
+</div>

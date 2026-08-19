@@ -1,0 +1,80 @@
+<div class="comparison-page-container">
+    <div class="page-header">
+        <h1>📊 Multi-Store Price Comparison Matrix</h1>
+        <p>Compare online store prices across Amazon, Flipkart, Croma, Reliance Digital, & Vijay Sales.</p>
+    </div>
+
+    <!-- Product Selector Chips -->
+    <div class="selector-section">
+        <span class="selector-label">Select Electronics Item to Compare:</span>
+        <div class="selector-chips">
+            @for (prod of allProducts(); track prod.id) {
+            <button type="button" class="prod-select-chip" [class.active]="selectedProduct()?.id === prod.id"
+                (click)="selectProduct(prod)">
+                <img [src]="prod.image" [alt]="prod.name" class="chip-img" />
+                <span>{{ prod.name }}</span>
+            </button>
+            }
+        </div>
+    </div>
+
+    @if (selectedProduct(); as prod) {
+    <!-- Selected Product Summary Bar -->
+    <div class="active-prod-banner">
+        <img [src]="prod.image" [alt]="prod.name" class="banner-img" />
+        <div class="banner-details">
+            <span class="brand-tag">{{ prod.brand }} • {{ prod.category }}</span>
+            <h2>{{ prod.name }}</h2>
+            <div class="banner-prices">
+                <span class="price-best">Best Deal: ₹{{ prod.price.toLocaleString('en-IN') }}</span>
+                <span class="price-mrp">MRP: ₹{{ prod.originalPrice.toLocaleString('en-IN') }}</span>
+            </div>
+        </div>
+        <button type="button" class="add-cart-cta" (click)="onAddToCart(prod)">
+            🛒 Add Best Deal to Cart
+        </button>
+    </div>
+
+    <!-- Store Comparison Cards Grid -->
+    @if (getComparisonSummary(); as comp) {
+    <div class="stores-grid">
+        @for (store of comp.stores; track store.storeName) {
+        <div class="store-card" [class.cheapest-store]="store.isBestDeal">
+            @if (store.isBestDeal) {
+            <div class="best-deal-ribbon">👑 LOWEST PRICE</div>
+            }
+
+            <div class="store-card-header">
+                <span class="store-name">{{ store.storeName }}</span>
+                <span class="stock-badge" [class.in]="store.inStock">
+                    {{ store.inStock ? 'In Stock' : 'Out of Stock' }}
+                </span>
+            </div>
+
+            <div class="store-card-price">
+                ₹{{ store.price.toLocaleString('en-IN') }}
+            </div>
+
+            @if (store.dealTag) {
+            <div class="deal-tag-box">
+                🏷️ {{ store.dealTag }}
+            </div>
+            }
+
+            <div class="store-card-savings">
+                @if (store.price < comp.highestStorePrice) { <span>Save ₹{{ (comp.highestStorePrice -
+                    store.price).toLocaleString('en-IN') }} vs highest online retailer!</span>
+                    } @else {
+                    <span>Highest list price recorded among competitors</span>
+                    }
+            </div>
+
+            <button type="button" class="store-buy-btn" [class.primary]="store.isBestDeal" (click)="onAddToCart(prod)">
+                Get Deal on {{ store.storeName }}
+            </button>
+        </div>
+        }
+    </div>
+    }
+    }
+</div>

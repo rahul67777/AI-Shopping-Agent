@@ -1,0 +1,62 @@
+@if (cartService.itemCount() > 0) {
+<div class="sticky-cart-wrapper" [class.expanded]="expanded()">
+    <!-- Drawer Header / Floating Pill -->
+    <div class="cart-pill" (click)="toggleDrawer()" (keydown.enter)="toggleDrawer()" tabindex="0" role="button"
+        aria-label="Toggle Smart Cart Drawer">
+        <div class="pill-left">
+            <div class="icon-bubble">
+                🛒
+                <span class="bubble-count">{{ cartService.itemCount() }}</span>
+            </div>
+            <div class="pill-info">
+                <span class="pill-title">Smart Cart</span>
+                <span class="pill-sub">₹{{ cartService.totalPrice().toLocaleString('en-IN') }}</span>
+            </div>
+        </div>
+
+        <div class="pill-right">
+            @if (cartService.estimatedSavings() > 0) {
+            <span class="savings-tag">Save ₹{{ cartService.estimatedSavings().toLocaleString('en-IN') }}</span>
+            }
+            <span class="chevron">{{ expanded() ? '▼' : '▲' }}</span>
+        </div>
+    </div>
+
+    <!-- Expanded Drawer Content -->
+    @if (expanded()) {
+    <div class="drawer-body">
+        <div class="drawer-header">
+            <h4>🛒 Cart Items ({{ cartService.itemCount() }})</h4>
+            <button type="button" class="close-btn" (click)="toggleDrawer()">✕</button>
+        </div>
+
+        <div class="drawer-items">
+            @for (item of cartService.items(); track item.product.id) {
+            <div class="drawer-item">
+                <img [src]="item.product.image" [alt]="item.product.name" class="item-thumb" />
+                <div class="item-meta">
+                    <span class="item-name">{{ item.product.name }}</span>
+                    <span class="item-price">₹{{ item.product.price.toLocaleString('en-IN') }} × {{ item.quantity
+                        }}</span>
+                </div>
+                <button type="button" class="remove-btn" (click)="cartService.removeItem(item.product.id)"
+                    title="Remove item">
+                    🗑️
+                </button>
+            </div>
+            }
+        </div>
+
+        <div class="drawer-footer">
+            <div class="total-row">
+                <span>Total:</span>
+                <span class="total-val">₹{{ cartService.totalPrice().toLocaleString('en-IN') }}</span>
+            </div>
+            <a routerLink="/shopping/cart" class="checkout-link-btn" (click)="expanded.set(false)">
+                Open Smart Cart & Checkout →
+            </a>
+        </div>
+    </div>
+    }
+</div>
+}

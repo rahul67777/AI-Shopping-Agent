@@ -1,0 +1,12 @@
+<div class="ai-badge-wrapper" [class]="scoreColorClass()" [title]="reason() || ('AI Score: ' + score() + '% Match')">
+    <div class="badge-icon">🤖</div>
+    <div class="badge-details">
+        <span class="score-percent">{{ score() }}%</span>
+        <span class="score-text">{{ scoreLabel() }}</span>
+    </div>
+</div>
+@if (showReason() && reason()) {
+<div class="ai-reason-box">
+    <span class="sparkle">💡 AI Insight:</span> {{ reason() }}
+</div>
+}

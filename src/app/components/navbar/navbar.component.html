@@ -1,0 +1,86 @@
+<header class="app-header">
+  <div class="nav-container">
+    <!-- Brand / Logo -->
+    <a routerLink="/shopping/home" class="brand-logo" aria-label="AI Shopping Agent Home">
+      <div class="logo-icon">
+        <span class="sparkle">✨</span>
+        <span class="bot-head">🛍️</span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-title">ShopAI</span>
+        <span class="brand-tag">AGENT v21</span>
+      </div>
+    </a>
+
+    <!-- Global App Switcher -->
+    <div class="global-switcher">
+      <a routerLink="/chatbot" routerLinkActive="active" class="switch-btn" title="Switch to General AI Chatbot">
+        <span class="icon">💬</span>
+        <span>General AI</span>
+      </a>
+      <a routerLink="/shopping" routerLinkActive="active" class="switch-btn active" title="AI Shopping Agent">
+        <span class="icon">🛒</span>
+        <span>Shopping Agent</span>
+      </a>
+    </div>
+
+    <!-- Quick Search Bar -->
+    <form class="nav-search-form" (submit)="$event.preventDefault(); onSearchSubmit()">
+      <div class="search-input-wrapper">
+        <span class="search-icon" aria-hidden="true">🔍</span>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search products or try 'Gaming setup under ₹80k'..."
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)"
+          name="navSearch"
+          aria-label="Search products or natural language prompt"
+        />
+        <button
+          type="button"
+          class="mic-btn"
+          [class.listening]="speechService.isListening()"
+          (click)="triggerVoiceSearch()"
+          [title]="speechService.isListening() ? 'Listening... click to stop' : 'Voice Search'"
+          aria-label="Voice Search"
+        >
+          🎤
+        </button>
+      </div>
+    </form>
+
+    <!-- Navigation Links -->
+    <nav class="nav-menu" [class.open]="mobileMenuOpen()" aria-label="Main Navigation">
+      <a routerLink="/shopping/home" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item">
+        <span class="nav-icon">🏠</span> Home
+      </a>
+      <a routerLink="/shopping/chat" routerLinkActive="active" class="nav-item badge-highlight">
+        <span class="nav-icon">🤖</span> AI Assistant
+      </a>
+      <a routerLink="/shopping/search" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">🔎</span> Catalog
+      </a>
+      <a routerLink="/shopping/comparison" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">📊</span> Compare Prices
+      </a>
+      <a routerLink="/shopping/cart" routerLinkActive="active" class="nav-item cart-nav-item">
+        <span class="nav-icon">🛒</span> Smart Cart
+        @if (cartService.itemCount() > 0) {
+          <span class="cart-count-badge">{{ cartService.itemCount() }}</span>
+        }
+      </a>
+    </nav>
+
+    <!-- Mobile Hamburger Menu Button -->
+    <button
+      type="button"
+      class="mobile-toggle"
+      (click)="toggleMobileMenu()"
+      aria-label="Toggle Navigation Menu"
+      [attr.aria-expanded]="mobileMenuOpen()"
+    >
+      <span class="hamburger"></span>
+    </button>
+  </div>
+</header>

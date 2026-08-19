@@ -1,0 +1,111 @@
+<div class="home-page-container">
+    <!-- Hero Banner -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="sparkle">✨</span> Powered by Gemini AI & Real-time Price Intelligence
+            </div>
+            <h1 class="hero-title">
+                Shop Smarter with Your Personal <span class="gradient-text">AI Shopping Agent</span>
+            </h1>
+            <p class="hero-subtitle">
+                Describe what you need in plain English or voice. Our AI analyzes prices, specs, customer reviews, and
+                multi-store deals across India to find your perfect match.
+            </p>
+
+            <!-- Natural Language AI Prompt Box -->
+            <form class="hero-prompt-box" (submit)="$event.preventDefault(); onPromptSubmit()">
+                <div class="input-wrapper">
+                    <span class="ai-sparkle-icon">🤖</span>
+                    <input type="text" class="hero-input"
+                        placeholder="Try asking: 'Find the best gaming laptop under ₹60,000'..."
+                        [ngModel]="promptInput()" (ngModelChange)="promptInput.set($event)" name="heroPrompt"
+                        aria-label="Ask AI Shopping Agent" />
+                    <button type="button" class="hero-mic-btn" [class.listening]="speechService.isListening()"
+                        (click)="speechService.toggleListening()" title="Voice Command" aria-label="Voice Command">
+                        🎤
+                    </button>
+                    <button type="submit" class="hero-submit-btn">
+                        Ask AI Agent →
+                    </button>
+                </div>
+            </form>
+
+            <!-- Sample Prompts Chips -->
+            <div class="sample-prompts">
+                <span class="prompt-label">Try these queries:</span>
+                <div class="chips-list">
+                    @for (sample of samplePrompts; track sample.text) {
+                    <button type="button" class="prompt-chip" (click)="useSamplePrompt(sample.text)">
+                        <span class="chip-icon">{{ sample.icon }}</span>
+                        <span>{{ sample.text }}</span>
+                    </button>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Category Grid Section -->
+    <section class="categories-section">
+        <div class="section-header">
+            <h2 class="section-title">Explore Categories</h2>
+            <a routerLink="/shopping/search" class="see-all-link">Browse Full Catalog →</a>
+        </div>
+
+        <div class="category-grid">
+            @for (cat of productService.categories; track cat.id) {
+            @if (cat.id !== 'all') {
+            <div class="category-card" (click)="filterByCategory(cat.id)" (keydown.enter)="filterByCategory(cat.id)"
+                tabindex="0" role="button">
+                <div class="cat-icon-wrapper">
+                    @switch (cat.id) {
+                    @case ('laptop') { 💻 }
+                    @case ('smartphone') { 📱 }
+                    @case ('monitors') { 🖥️ }
+                    @case ('peripherals') { ⌨️ }
+                    @case ('audio') { 🎧 }
+                    @default { 📦 }
+                    }
+                </div>
+                <span class="cat-label">{{ cat.label }}</span>
+            </div>
+            }
+            }
+        </div>
+    </section>
+
+    <!-- AI Smart Cart Banner -->
+    <section class="ai-banner-card">
+        <div class="banner-badge">⚡ INSTANT BUNDLE GENERATOR</div>
+        <div class="banner-flex">
+            <div class="banner-text">
+                <h3>Building a full PC, Gaming, or Coding Setup?</h3>
+                <p>Tell our AI your budget (e.g. ₹80,000) and intent. It automatically selects the optimal laptop,
+                    mouse, keyboard, monitor, and headphones to create a complete Smart Cart within your budget.</p>
+            </div>
+            <a routerLink="/shopping/chat" [queryParams]="{q: 'Build a complete coding setup under ₹80,000'}"
+                class="banner-cta">
+                🤖 Build AI Smart Setup →
+            </a>
+        </div>
+    </section>
+
+    <!-- Top AI Recommendations -->
+    <section class="recommendations-section">
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">🔥 Top AI Recommended Products</h2>
+                <p class="section-sub">Ranked by specs, user reviews, budget value ratio, and price drop history.</p>
+            </div>
+            <a routerLink="/shopping/search" class="see-all-link">View All Ranked Products →</a>
+        </div>
+
+        <div class="products-grid">
+            @for (prod of productService.topRecommended(); track prod.id) {
+            <app-product-card [product]="prod" [highlightAi]="true" (addToCart)="onAddToCart($event)"
+                (compare)="onCompare($event)"></app-product-card>
+            }
+        </div>
+    </section>
+</div>
